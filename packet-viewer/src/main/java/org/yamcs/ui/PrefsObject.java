@@ -3,9 +3,11 @@ package org.yamcs.ui;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 public class PrefsObject {
@@ -45,9 +47,21 @@ public class PrefsObject {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(raw);
             ObjectInputStream ois = new ObjectInputStream(bais);
+            ois.setObjectInputFilter(info -> {
+                if (info.depth() > 3 || info.references() > raw.length || info.arrayLength() > raw.length) {
+                    return ObjectInputFilter.Status.REJECTED;
+                }
+                Class<?> type = info.serialClass();
+                if (type == null) {
+                    return ObjectInputFilter.Status.UNDECIDED;
+                }
+                // ArrayList requests an Object[] allocation while reading its elements.
+                return (type == ArrayList.class || type == String.class || type == String[].class
+                        || type == Object[].class) ? ObjectInputFilter.Status.ALLOWED : ObjectInputFilter.Status.REJECTED;
+            });
             return ois.readObject();
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            return null;
         }
     }
 }
