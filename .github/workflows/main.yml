@@ -82,7 +82,7 @@ jobs:
           java-version: 17
       - name: Generate protobin
         run: mvn -B --no-transfer-progress -DskipTests compile
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.14"
       - name: Set up sphinx
