@@ -324,6 +324,7 @@ public class RestClient {
     }
 
     public void addCookie(Cookie c) {
+        c.setSecure(true);
         httpClient.addCookie(c);
     }
 
