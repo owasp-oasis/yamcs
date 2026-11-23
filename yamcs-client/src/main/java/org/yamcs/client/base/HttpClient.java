@@ -527,7 +527,7 @@ public class HttpClient {
         if (userAgent != null) {
             request.headers().set(HttpHeaderNames.USER_AGENT, userAgent);
         }
-        if (cookies != null) {
+        if (cookies != null && "https".equalsIgnoreCase(uri.getScheme())) {
             String c = ClientCookieEncoder.STRICT.encode(cookies);
             request.headers().set(HttpHeaderNames.COOKIE, c);
         }
@@ -558,6 +558,7 @@ public class HttpClient {
     }
 
     public void addCookie(Cookie c) {
+        c.setSecure(true);
         if (cookies == null) {
             cookies = new ArrayList<>();
         }
